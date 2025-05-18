@@ -1,5 +1,6 @@
-/**
- * Configuration client API Axios
+/** api/axios.ts
+ 
+* Configuration client API Axios
  * 
  * @module api
  * @description Ce module configure et exporte une instance Axios préconfigurée

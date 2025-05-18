@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -21,7 +21,9 @@ export default function WelcomeScreen() {
       });
       return;
     }
+
     await AsyncStorage.setItem('myapp_active_tab', 'Test');
+    navigation.navigate('Main');
   };
 
   const goToLogin = () => {
@@ -33,13 +35,19 @@ export default function WelcomeScreen() {
       navigation.navigate('Main');
     }
   }, [token]);
-  
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>myapp Test Screen</Text>
-      
+      <Text style={styles.title}>Bienvenue sur <Text style={styles.brand}>MyApp</Text></Text>
+      <Text style={styles.subtitle}>Testez l'accès sécurisé via votre jeton JWT</Text>
+
       <Pressable
-        style={[styles.link, !token && styles.linkDisabled]}
+        style={({ pressed }) => [
+          styles.link,
+          !token && styles.linkDisabled,
+          pressed && styles.linkPressed
+        ]}
+        android_ripple={{ color: '#E5E7EB' }}
         onPress={goToTest}
       >
         <FontAwesome5
@@ -49,7 +57,7 @@ export default function WelcomeScreen() {
           style={{ marginRight: 10 }}
         />
         <Text style={[styles.linkText, !token && styles.linkTextDisabled]}>
-          Test du token JWT
+          Lancer un test JWT
         </Text>
       </Pressable>
 
@@ -71,10 +79,19 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 8,
+  },
+  brand: {
     color: '#6C63FF',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#4B5563',
     marginBottom: 32,
+    textAlign: 'center',
   },
   link: {
     flexDirection: 'row',
@@ -84,9 +101,16 @@ const styles = StyleSheet.create({
     padding: 16,
     width: '100%',
     elevation: 2,
+    shadowColor: Platform.OS === 'android' ? 'black' : '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   linkDisabled: {
     opacity: 0.5,
+  },
+  linkPressed: {
+    backgroundColor: '#f9fafb',
   },
   linkText: {
     fontSize: 16,
@@ -101,6 +125,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 8,
+    elevation: 1,
   },
   loginButtonText: {
     color: '#fff',

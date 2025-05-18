@@ -1,47 +1,31 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
-import Toast from 'react-native-toast-message';
-
+import { View, Text, Button, ActivityIndicator, StyleSheet } from 'react-native';
 import client from '../api/client';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
-const UserScreen = () => {
+export default function UserScreen() {
+  const { logout } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const navigation = useNavigation();
-  const { token } = useAuth();
+  const fetchUser = async () => {
+    try {
+      const response = await client.get('/users/me/');
+      setUser(response.data.data); // ✅ adapté à ta structure personnalisée
+    } catch (error) {
+      console.error('Erreur lors du chargement du profil :', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // 🔒 Redirection si l'utilisateur n'est pas connecté
-    if (!token) {
-      Toast.show({
-        type: 'info',
-        text1: 'Connexion requise',
-        text2: 'Veuillez vous connecter pour accéder à votre profil.',
-      });
-      navigation.navigate('Login' as never);
-      return;
-    }
-
-    const fetchUser = async () => {
-      try {
-        const res = await client.get('api/me/');
-        setUser(res.data);
-      } catch (err) {
-        console.error('Erreur lors du chargement du profil :', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUser();
-  }, [token]);
+  }, []);
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View style={styles.center}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -49,24 +33,43 @@ const UserScreen = () => {
 
   if (!user) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text>Impossible de charger le profil utilisateur.</Text>
+      <View style={styles.center}>
+        <Text>Impossible de charger l'utilisateur</Text>
+        <Button title="Se déconnecter" onPress={logout} />
       </View>
     );
   }
 
   return (
-    <ScrollView className="flex-1 p-4">
-      <Text className="mb-4 text-2xl font-bold">Profil utilisateur</Text>
-      <Text>Nom d'utilisateur : {user.username}</Text>
-      <Text>Email : {user.email}</Text>
-      <Text>XP : {user.xp}</Text>
-      <Text>Niveau : {user.level}</Text>
-      <Text>Progression : {user.level_progress}%</Text>
-      <Text>Streak actuel : {user.current_streak}</Text>
-      <Text>Streak max : {user.longest_streak}</Text>
-    </ScrollView>
-  );
-};
+    <View style={styles.container}>
+      <Text style={styles.title}>Profil Utilisateur</Text>
+      <Text style={styles.label}>Nom complet : {user.first_name} {user.last_name}</Text>
+      <Text style={styles.label}>Email : {user.email}</Text>
+      <Text style={styles.label}>Rôle : {user.role}</Text>
 
-export default UserScreen;
+      <Button title="Se déconnecter" onPress={logout} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 22,
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+});

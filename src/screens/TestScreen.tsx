@@ -6,16 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 const TestScreen = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const testToken = async () => {
     try {
       setLoading(true);
-      const res = await client.get('/test-token/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await client.get('/api/test-token/');
       setData(res.data);
     } catch {
       setData({ error: 'Token invalide ou erreur serveur' });
@@ -25,12 +21,12 @@ const TestScreen = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (isAuthenticated) {
       testToken();
     } else {
-      setData({ error: 'Aucun token trouvé, utilisateur non connecté' });
+      setData({ error: 'Utilisateur non connecté (pas de token)' });
     }
-  }, [token]);
+  }, [isAuthenticated]);
 
   return (
     <View style={styles.container}>
