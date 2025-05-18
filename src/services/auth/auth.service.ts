@@ -4,7 +4,7 @@ import client from '../../api/client'; // ← ton fichier axios
 const TOKEN_KEY = 'token';
 
 export const login = async (email: string, password: string) => {
-  const response = await client.post('/api/token/', { email, password });
+  const response = await client.post('/token/', { email, password });
   const { access } = response.data;
   await AsyncStorage.setItem(TOKEN_KEY, access);
   return access;

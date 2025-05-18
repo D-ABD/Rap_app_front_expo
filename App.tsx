@@ -30,6 +30,9 @@ import Toast from 'react-native-toast-message';
 import { AuthProvider } from '@/contexts/AuthContext';
 import AppNavigator from '@/navigation/AppNavigator';
 
+
+
+
 /**
  * Composant racine de l'application
  * 

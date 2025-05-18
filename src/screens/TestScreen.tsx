@@ -11,7 +11,7 @@ const TestScreen = () => {
   const testToken = async () => {
     try {
       setLoading(true);
-      const res = await client.get('/api/test-token/');
+      const res = await client.get('/test-token/');
       setData(res.data);
     } catch {
       setData({ error: 'Token invalide ou erreur serveur' });
